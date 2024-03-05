@@ -1,0 +1,54 @@
+
+///////////////
+premik kvadrata
+
+int main() {
+    vColor = aColor;
+    vec2 translation = vec2(0.2, 0.5)
+    gl_Position = vec4(aPosition + translation, 0, 1);
+}
+
+zdej bi lahko spet mel spremenljivko od zunj ki jo posljemo notr in je skupna vsem ogliscem 
+
+tuki pridejo pa uniforme 
+uniform vec2 uTranslation;
+
+int main() {
+    vColor = aColor;
+    gl_Position = vec4(aPosition + uTranslation, 0, 1);
+}
+
+v programu preden izrisemo dodamo uniformo 
+
+const uTranslation = gl.getUniformLocation(program, 'uTranslation');
+s tem dejansko vprasam na kateri lokaciji je uniforma ker ne morm narest enako kot smo za atribute
+gl.uniform2f(uTranskation, 0.2, 0.5)
+
+z requestAnimationFrame(funckija) dejansko povemo da naslednic k se bo refreshu zaslon mi zalaufi to fukncijo
+
+za animacije nardimo render funckijo in notr risemo 
+
+time = perormance.now / 1000;
+
+in nardimo 
+
+render () {
+    use program 
+
+    naredu iniformo 
+
+    clear canvas 
+
+    draw arrays
+}
+
+uniformo pa pac vsakic mal drugo posljemo glede na cas 
+
+cas je lhko tud drgac 
+
+const x = math.cons(time)
+const y = math.sin(time)
+
+ce tedve stvari pomnozimo z a ¸bomo spremenijali radij 
+
+gl.uniform2f(uTranskation, x, y)

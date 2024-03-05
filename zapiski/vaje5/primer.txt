@@ -1,0 +1,121 @@
+dons mamo pa kao ze framework
+
+nakonc pejt pogledat importe da so pravilno napisani (velike male crke)
+
+
+Osvetljevanje:
+
+Dodaj Type na te classse spodaj
+
+za primer mamo labert 
+
+resize sytem ma pa update sytem in sta dva sistema z reizanje ampak to se mi zdi da ze mas 
+ce ga hoces uporabljat ga samo deklariras in zazenes 
+
+plus resize sytem funkcijo mors napisat 
+
+update je pa za animationFrame kar tud ze mas 
+
+tip lepo nardi nek nov node z imageLoader ampak je basicaly GLTF 
+
+UV editnig so texturne koordinate
+
+mmao indices + Vertex objetk in iz tega je sestavlejn naš Mesh
+
+skupi material je sestvaljen iz Textur ki maj osvoj class 
+
+skupi nam material in mesh dajo Primitive 
+
+primitive pa nam da Model 
+
+
+base rendere je osnova unlit je pa samo za primitive brez osvetljevanj 
+
+base rendeder mora znat vzet mesh in iz tega nares vertex in index buffer, v njemu povemo na kateri lokacijah mamo v shaderju atribute
+če želim uporabit nek material ga mrormo najprej pripravit za uporabo, torej ce rabimo kaksne vire mormo to prenest na shader 
+ce mamo slike jih mormo gor nalozt in preapare material ti to dela 
+
+
+preapare image nam nalozi sliko na grafično kartico in tam notri zgenerira se MIPMAPE!!!!!
+te stvari tudi zahashamo (tko k david) da ne rabmo vsakic posebi te stvari pošiljat in to nardimo z slovarjem glObject kamor shranjujemo stvari
+ki jih nalagamo v grafično kartico 
+
+kako se te stvari izrišejo zdej:
+
+tuki pride pa unlit renderer ki dobi 2 shaderja in notri zbuilda programe 
+
+backface culling (izločanje zadnjih ploskev je pomebno)!!!
+
+mamo zdej 3 funkcije;
+
+mamo render povemo katero sceno iz katere kamere tuki natvaimo view in projection sceno (nas pogled)
+
+zdej pa gre dol pohierarhiji in izriše tko da nardi bufferje ter jih pošlje na shader
+
+render primitive in tuki pošljemo grafični kartici barve pa texture 
+
+to mi zdej damo v svoj projekt tko da unlit rendeder dodamo v projekt 
+
+zdej vzamemo ta rendere in ga tko razsirmo da delajo gor se luci 
+pa seveda tud shader razsirmo 
+
+dodamo mu faceFaktor ki je neka konstantna barva s katero pomnožimo našo barvo
+in to rabis nujno 
+
+rabimo najprej luč 
+torej kje se nahaja rabimo vedit 
+
+zdej mormo za vsako tocko zračunat vektor do luči (L)
+
+
+rabimo tudi intesity torej kolk močno sveti luč 
+
+pa barvo luči
+
+zdej rabimo se normalo (N) ki je pravokotni vekto na našo površino in je odvisno kje na površini se nahajamo in vedno je dolg 1 enoto 
+vektor L bomo normaliziral
+
+L zračunamo tko da damo Identiteta do površine - do luči in tega tudi normalizeramo (||L||)
+
+nas pa zanima zdej kot (fi) med vektojem N in L iz pod kakšnim koto pada svetloba na površino 
+zdej pa na kotu nič sveti najbolje, na kotu 90 sveti 0 in pade svetlobe glede na kot je cosinusna funkcija 
+cosinus zracunamo z dot product N * L 
+
+normalo mormo dobit ze v naprej ker jih v shaderju ne mormo zračunat in jih dobimo iz blenderja 
+
+normale mormo normalizerat pa v snčilniku (da so dolge 1)
+
+zdej pa v shader pošljemo normalo preko baseRenderja ko kliče preapare mesh na lokaciji 2 
+
+normalo bo treba najprej interpolirat v fragment shader 
+
+tam jo dobimo kot input vec3 vNormal;
+
+rabimo v fragmentu se vektor luci 
+vec3 L = vec3(0, 1, 0);
+vec3 N = normalize(vNormal)
+float brightness = dot(N, L); to ja nas cosinus za osvetlitev 
+
+in pa se barvo zdej pomnozimo z nasim brightnessom
+
+oColor = uBaseFactor * uBaseColor * vec4(vec3(brightness), 1);
+brigtness je float in ga samo damo v vec3 (da se pomnožijo vse barve) potem pa v vec4 kjer je zadnja alpfa vedno 1 (RGBA)
+
+Proble je zdej da normale ne transformiramo tko k pozicije
+
+in ko posljemo normalo jo prav tako pomnožimo z uNormalMatrix 
+
+to v renderju posljemo notr
+cosnt normalMatrix = localMatrix 
+in jo posljemo notr v shader 
+
+ampak normala je je vec3 in anardimo 
+vNormal = (uNormalMatrix * vec4(aNormal, 0)).xyz 
+tuki more bit 0 ker 1 je samo z atranslacije mi hocmo pa normalo ohranit enako
+
+ker nocmo met teme, mao problem ker cosinus gre tud v minus zato dmo na nas brightness 
+max(dot(L, N) , 0.0) + 0.3
+
+če hočeš da stvar utripa samo notri pošlješ še min brightness 
+
+dejansko kar morš narest je pa da mas vsak node svoje te stvari da lahko delaš to na lokalni node in v shaderju samo seštekeš

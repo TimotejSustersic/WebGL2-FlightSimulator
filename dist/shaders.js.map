@@ -1,0 +1,1 @@
+{"version":3,"file":"shaders.js","sourceRoot":"","sources":["../src/shaders.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,GAAG;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EA8Bb,CAAC;AAGH,MAAM,QAAQ,GAAG;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAgDf,CAAC;AAEH,MAAM,CAAC,MAAM,OAAO,GAAG;IACnB,SAAS,EAAE,EAAE,MAAM,EAAE,QAAQ,EAAE;CAClC,CAAC"}

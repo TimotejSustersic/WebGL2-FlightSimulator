@@ -1,0 +1,30 @@
+zdej bi pa radi poleg oglis zraven skupaj poslali se barve 
+torej array najprej oglisce potem pa barva
+
+zdej nardimo buffer tko k znamo in mu recemo vertexBuffer 
+
+gl.bindBuffer()
+gl.bufferData()
+
+enako mamo dva vertex arra
+
+gl.enableVertexAttribArray(0);
+gl.vertexAttribPointer(0, 2, gl.Float, false, 24, 0)  // 24 je velost vrstice v bajti
+
+gl.enableVertexAttribArray(1);
+gl.vertexAttribPointer(1, 4, gl.Float, false, 24, 8) 77 8 je pa offset za barve
+
+
+vertex shader {
+    (layout = 0) in vec2 aPosition; // atribut je lahko pozicija, barva, texturne coordinate oz podatki ki so vezani na posamezno oglisce
+    (layout = 1) in vec4 aColor;
+
+    uniform vec2 uTranslation; 
+
+    out vec4 vColr;
+
+    void main() {
+        gl_Position = vec43(aPosition + uTranslation, 0, 1);
+        vColor = aColor;
+    }
+}

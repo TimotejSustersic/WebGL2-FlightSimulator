@@ -1,0 +1,27 @@
+zdej bomo dodal animacijo na model 
+
+model.addComponent(new Animation) 
+
+
+model.addComponent({
+    update() {
+        // nasa rotacija
+    }
+}) 
+
+
+
+scene.traverse(node => {
+    for (cont components of node.component) {
+        component.update()
+    }
+}) // gre cez vsak node v sceni
+
+
+
+
+turntableControlel je basicly da kamero obracas okoli noda
+mas izhodisce in nek vektor ki predstavlaj vektor za kamero in ti z misko spreminjas ta vektor 
+in ti mors kamero prestvalkjat po prostori un j orotirat da gkeda proti modelu 
+
+in ti das to na kamero kot new component z parametri (camera, document.body)

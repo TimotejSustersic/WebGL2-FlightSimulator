@@ -1,0 +1,92 @@
+
+drug primer da mamo tri oglisca z drufimi barvami
+
+
+////////////////////////////////////////
+Live rimer 
+
+
+shader 
+vertex:
+
+v sencilniku povemo kje se nahajajo oglisca od nasga trikotnika
+vec2 position[] = vec2[] (
+    vec2(-0.5, -0.5)
+    vec2( 0.5, -0.5)
+    vec2( 0.0,  0.5)
+);
+to mamo zdej v seznamu tocke trikotnika in jih mormo se nastavt 
+
+zdej mormo narest se tri barve
+vec4 colors[] = vec4[](
+    vec4(1, 0, 0, 1),
+    vec4(0, 1, 0, 1),
+    vec4(0, 0, 1, 1),
+)
+
+// za komunikacijo za fragment shaderjem mormo zdej narest neko output spremenljivko
+out vec4 vColor; 
+
+void main() {
+
+    vec2 position = position[gl_VertexId]; // gl_VertexId je spremenljivka od graficne k ti ta trikotnik da oglisca po 0, 1, 2 in jih samo tko definiras
+    //gl_Position = vec4(position[0], position[1], 0, 1); isto
+    //gl_Position = vec4(position.x, position.y, 0, 1); isto
+    gl_Position = vec4(position, 0, 1); isto
+
+    vColor = color; // tuki smo zdej inicializeral
+}
+
+
+fragment  
+
+out vec4 oColor;  // (gre za barvo rgba)
+
+tuki mormo met isti ime enak tip
+in vec vColor;
+
+int main () {
+    oColor = vColor;
+}
+
+// to da se barva preliva pomeni interpolacija in je tolk pogosto v grafiki da se to avtomasko delajo
+// lahko bi interpoliru tud tezo, svetlost oz karkoli
+
+// output fragment shaderja je barva  
+
+
+//nadaljevanje naredmo nek kvadrat 
+// zdej na mi ne rabmo v sharejih definerat tele vektorje bomo nardil v js nek buffer notr dal podatke in ga poslal v shader 
+
+v programu mamo zdej array tock = positions in pa array barv = colors 
+(new Float32Array (array tock))
+
+ustvarimo buffer 
+gl.createBuffer();
+potem ga aktiviramo(gl.Array_BUFFER, bufer)
+driver ma nek pointer ki kaze na trenutno aktiviran buffer
+zdej pa gor se nalozimo podatke gl.BufferData(gl.Array_BUFFER, positions, gl.STATIC_DRAW) // zadn parameter je fiksen vedno tak 
+
+zdej mormo to povezat z shaderjem 
+gl.EnableVertexAttribArray(stv_Atributa) // to pomeni da doloc atribut ki ga bomo notr dal bo bral iz bufferja
+
+torej atribut na lokaciji x bo bral it tega bufferja 
+
+zdej pa povemo se iz katerga buferja beremo 
+najprej ga aktiviramo z gl.bindBuffer 
+nato pa ga povezemo na atribut stv x
+params: stv_atributa, 2 stevilki, tipa float, 
+gl.vertexAttribPointer(x, 2, gl.FLoat, false, 0, 0)
+
+
+Vertex:
+zdej pa v vertex shaderju povemo da mamo input into bo input nasega buferja iz programa 
+layout (location = stv_atributa) in vec2 aPositions;  // 'a' je atribut in en atribut je position
+layout (location = stv_atributa2) int vec4 aColor;
+
+out vec4 vColor;
+
+int main() {
+    vColor = aColor;
+    gl_Position = vec4(aPosition, 0, 1);
+}

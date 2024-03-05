@@ -1,0 +1,108 @@
+zdej bi radi mel kocko
+
+const vertices = new Float32Array([
+    //  positions            colors           index
+    -1, -1, -1,  1,      0,  0,  0,  1,    //   0
+    -1, -1,  1,  1,      0,  0,  1,  1,    //   1
+    -1,  1, -1,  1,      0,  1,  0,  1,    //   2
+    -1,  1,  1,  1,      0,  1,  1,  1,    //   3
+     1, -1, -1,  1,      1,  0,  0,  1,    //   4
+     1, -1,  1,  1,      1,  0,  1,  1,    //   5
+     1,  1, -1,  1,      1,  1,  0,  1,    //   6
+     1,  1,  1,  1,      1,  1,  1,  1,    //   7
+]);
+ 
+const indices = new Uint32Array([
+    0, 1, 2,    2, 1, 3,
+    4, 0, 6,    6, 0, 2,
+    5, 4, 7,    7, 4, 6,
+    1, 5, 3,    3, 5, 7,
+    6, 2, 7,    7, 2, 3,
+    1, 0, 5,    5, 0, 4,
+]);
+
+importas matrices library 
+
+gl.enableVertexAttribArray(0);
+gl.vertexAttribPointer(0, 4, gl.Float, false, 32, 0)
+
+gl.enableVertexAttribArray(1);
+gl.vertexAttribPointer(1, 4, gl.Float, false, 32, 16)
+
+let matrix = mat4.create();
+
+// zdej mamo pa foro matrix 
+mamo predmet svet in pogled 
+zacnemo v koordinatnem sistemu predmeta (lokalni koordinatni sistem)
+zdej to transponiramo v prostor (globalni KS) (xyz) in ta predmet postavimo v sceno kar je prva transformacija 
+
+zdej mormo pa seenkrat transformirat tko da je to v lokalnem koordinatnem sistemu kamere  (glediščni KS) 
+
+zadnja stvar pa je perpektivna projekcija na kanvas
+
+prva je model matrix (v globalni) potem iz svetovnega v sistem kamere (viev matrix) in nakonc se projection metrix
+
+pravili vrstni red je seveda pomemben
+
+update ( {
+
+    const modelMatrix = mat4.create();
+    const viewMatrix = mat4.create();
+    const projectionMatrix = mat4.create();
+
+    const time = performance.now() / 100;
+
+    // set model matrix 
+    mat4.indetity(modelMatrix);
+    mat4.rotateX(modelMatrixm modelMatrix, time * 0.6); // cilj, matrika, ifra po kateri rotiramo
+    mat4.rotateY(modelMatrixm modelMatrix, time * 0.5); 
+    mat4.rotateZ(modelMatrixm modelMatrix, time * 0.8);
+
+    // View matrix
+    mat4.fromTranslation(viewMatrix, [0, 0, -8 + Math.sin(time * 5)]) postavil smo se 8 metrov nazaj od skatle
+
+    // projection matrix
+    // rabimo notr dat parametre fovy(vertikalen kot ki ga razpenjamo) ,
+    // aspectRatio razmerje kanvasa,
+    // near pac zacetek pogleda, (metri)
+    // far pa konec pogleda, mi mamo od 1 cm do 1km
+    mat4.perspective(projectionMatrix, 1, canvas.width / canvas.height, 0.01, 1000);
+
+    mat4.identity(matrix); // to je da ne upirabimo tastare matrike
+    mat4.multiply(matrix, modelMatrix, matrix ); // output in pa 2 matrike k jih bos zmnozil
+    mat4.multiply(matrix, viewMatrix, matrix );
+    mat4.multiply(matrix, projectionMatrix, matrix );
+})
+
+
+zdej problem pride ker ne vemo globin. go smo ustvaril context se je buffer za globine ze ustvaru mi ga mormo samo enablat 
+gl.enable(gl.Depth_TEST);
+// to damo cist na zacetek ko ustvarim oprogram 
+ in tud k delamo clear clearamo tud DEPTH_BUFFER_BIT
+
+
+
+funtion render() {
+
+    const uMatrix = ...
+    gl.uniformMatrix4fv(uMatrix, false, matrix); // 4x4 matrika floatov in v ker smo podali array, 
+    sam parameter false pove a se bodo poslal podatki pos stolpcih al se transponira v vrstice
+
+    drawElemnets ma novo stevilo oglisc kar je indices.lengt 
+
+}
+
+
+vertex shader {
+    (layout = 0) in vec4 aPosition; // atribut je lahko pozicija, barva, texturne coordinate, globine oz podatki ki so vezani na posamezno oglisce
+    (layout = 1) in vec4 aColor;
+
+    uniform mat4 uMatrix; 
+
+    out vec4 vColr;
+
+    void main() {
+        gl_Position = aPosition * uMatrix;
+        vColor = aColor;
+    }
+}

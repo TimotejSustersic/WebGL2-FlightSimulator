@@ -1,0 +1,23 @@
+rotateanimator(node, {
+    endRotation[1, 0, 0, 0], 
+})
+
+
+dejansko mi nardim onew node light ki je tudi svoj class 
+spremeni ga da nimaš direction ampak smao color pa intensity 
+in light je komponenta 
+
+zdej v renderju poiščemo našo luč in jo pošljemo v shader 
+scene.find(node => node.getComponetntsOfType(Light).length > 0) razlika med filter je da tu in da vse find pa prvega 
+globalno pozicijo luči dobimo z getGlobalModelMatrix(light)
+zadnji stolpec matrike je pozicija
+funkcija je mat4.getTranslation()
+lightPosition = mat4.getTranslation(vec3.create(), lightMatrix)
+
+zdej kot uniformo pošljemo oba podatka notri od luči (pozicijo in barvo) 
+
+L = normalize(uLightPosition - surfacePosition)
+surface position pa so nace pozicije v fragmentshaderju in mormo te notri poslat 
+in zdej pride (vPosition * modelmatri).xyz // zdej mao globalno pozicijo nase tocke 
+
+

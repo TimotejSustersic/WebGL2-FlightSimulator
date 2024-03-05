@@ -1,0 +1,1 @@
+{"version":3,"file":"Mesh.js","sourceRoot":"","sources":["../../../../src/common/engine/core/Mesh.ts"],"names":[],"mappings":"AAAA,MAAM,OAAO,IAAI;IASb,YAAY,EACR,QAAQ,GAAG,EAAE,EACb,OAAO,GAAG,EAAE,GACf,GAAG,EAAE;QACF,IAAI,CAAC,QAAQ,GAAG,QAAQ,CAAC;QACzB,IAAI,CAAC,OAAO,GAAG,OAAO,CAAC;IAC3B,CAAC;CACJ"}

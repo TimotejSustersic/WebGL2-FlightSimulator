@@ -1,0 +1,17 @@
+mamo render kmor damo podatke o luc in to pride v shader 
+
+dons lambertov primer raysirmo tko da damo notr kamero
+definiramo vektor V kot viewVector in ta bo usmerje od tocke na povrsini proti kameri 
+druga stvar je odbiti vektor R kot refrective vector 
+in ta je vektor ki pride iy odboja yarka svetlobe od povrsine
+kot med L in R je enak funkcija reflect (mogoce je treba dat se kaksen predznak notr dat)
+racunamo pa kot med R in V (skalar) in to je Phongov model
+tega ne monozimo ampak samo pristejemo 
+
+C(N * L + A) + R * V 
+
+negiramo l vector 
+viewMatrix za kamero mnde ni najboljs
+
+lambert.. N * L 
+Phong.. R * V

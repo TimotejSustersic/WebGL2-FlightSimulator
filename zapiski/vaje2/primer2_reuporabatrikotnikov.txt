@@ -1,0 +1,30 @@
+zdej bi radi mi trikotnike od kvadratov prspala zato nardimo vsa oglisca jih indeksiramo,
+nato pa posljemo se en buffer ki poslje uporabo teh oglisc 
+
+// create index buffer 
+const indeces = new Unit32Array([
+    0, 1, 2,
+    1, 2, 3
+])
+
+const indexBuffer = gl.createBuffer();
+gl.bindBuffer(gl.Element_ARRAY_Buffer, indexBuffer);
+gl.BufferData(gl.Element_ARRAY_Buffer, indices, gl.Static_DraW);
+
+kar momro v render spremenit je da ne risemo vec trikotnikov ampak elemnte 
+gl.drawElements(mode, count, type, offset) // (gl.Triangles, 6, gl.UnsingedInt, 0) // ofset za nas brezveze
+
+
+vertex shader {
+    (layout = 0) in vec2 aPosition; // atribut je lahko pozicija, barva, texturne coordinate oz podatki ki so vezani na posamezno oglisce
+    (layout = 1) in vec4 aColor;
+
+    uniform vec2 uTranslation; 
+
+    out vec4 vColr;
+
+    void main() {
+        gl_Position = vec43(aPosition + uTranslation, 0, 1);
+        vColor = aColor;
+    }
+}

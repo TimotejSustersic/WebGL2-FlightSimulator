@@ -1,0 +1,6 @@
+zdej mamo pa mi nas spil in mamo drevesn ostrukturo
+
+na ta nacin ce premaknes avto se bodo tud njegovi otroc premaknil 
+in vsak node ma funkcije na transformacije itd 
+
+zdej pa mamo komponente kot so animations, model, camera, transform in te stvari lepimo in dodajamo na nase node 

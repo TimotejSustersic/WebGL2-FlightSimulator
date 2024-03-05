@@ -1,0 +1,69 @@
+Mamo canvas element ki je 2D slika.
+Potem iz canvasa dobimo contekst in izberemo webgl2
+
+S tem dostopamo do graficne kartice 
+
+Canvas barvamo:
+gl.ClearColor(0, 0, 0, 1)  // rgba
+gl.clear(gl.Color_BUFFER_BIT) // pobarvaj
+to mors povedat po tem k si program nareedu
+
+da risemo trikotnike mamo male programcke (shajderje) 
+1. (Vertex) pove kje so trikotniki na zaslonu, namenjen je transformacijam oglišč
+2. (Fragment) pa barvo vsazga piksla
+
+///////////////////
+Vertex:
+gl_position je 4x vector k drzi pozicijo vsakega oglisca
+funkcija main se bo pognala enkrat za vsako oglisce
+
+v glsl tud delajo te osnovne vektorske funkcije kot so dot 
+
+vec4(x, y, 0, 1)
+
+v njemu mormo definerat "precision mediump float;" za floate
+////////////////////////////
+////////////////////////////
+Fragment:
+
+
+
+////////////////////////////
+
+
+sencilnike mormo tud zdej scompilat
+iz serverja jih z fetch('shader') potegnemo dol in jih seveda pocakamo in ko dobimo response
+jih ustvarimo z gl.createShader kjer kot parameter dodamo tip shaderja 
+zdej pa na njih pripnemo naso kodo shaderja z gl.ShaderSource(shader, koda shaderja)
+in jih nakonc scompilamo z gl.compileShader(shader)
+
+zdej ce je kej narobe prasamo graficno kartico in to printamo z gl.getShaderInfoLog(shader)
+
+zdej jih mormo pa se zlinkat med sabo in skupaj jih zvezemo v PROGRAM 
+const program = gl.createProgram()
+na njih pripnemo oba shaderja 
+gl.attachShader(program, shader)
+
+ko sta oba pripeta jih zlinkamo 
+gl.linkProgram(program)
+
+za napake tukaj recemo gl.getProgramInfoLog(program)
+
+
+na koncu ko je vse kul program uporabmo
+gl.useProgram(program)
+zdej povemo da bomo ta program uporabil za risanje
+
+
+Zdej pa lahko risemo 
+
+povemo mu kaj risemo (tocke(pixle) crte in trikotnike) in mi bomo ce ze vedno uporabljal trikotnike
+params: kaj risemo, map (vedno 0), stevilo oglisc ki jih risemo
+gl.drawArrays(gl.Triangles, 0, 3);
+
+----------
+
+canvas je 
+(-1, 1)   (1, 1)
+    (0, 0)
+(-1, -1)  (1, -1)

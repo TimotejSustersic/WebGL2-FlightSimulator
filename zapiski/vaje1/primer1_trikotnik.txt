@@ -1,0 +1,34 @@
+////////////////////////////////////////
+Live rimer 
+
+
+shader 
+vertex:
+
+v sencilniku povemo kje se nahajajo oglisca od nasga trikotnika
+vec2 position[] = vec2[] (
+    vec2(-0.5, -0.5)
+    vec2( 0.5, -0.5)
+    vec2( 0.0,  0.5)
+);
+to mamo zdej v seznamu tocke trikotnika in jih mormo se nastavt 
+
+void main() {
+
+    vec2 position = position[gl_VertexId]; // gl_VertexId je spremenljivka od graficne k ti ta trikotnik da oglisca po 0, 1, 2 in jih samo tko definiras
+    //gl_Position = vec4(position[0], position[1], 0, 1); isto
+    //gl_Position = vec4(position.x, position.y, 0, 1); isto
+    gl_Position = vec4(position, 0, 1); isto
+}
+
+
+fragment  
+
+out vec4 oColor;  // (gre za barvo rgba)
+
+int main () {
+    oColor = vec4(1, 0, 0, 1); zdej smo pa dolocili barvo
+}
+
+
+

@@ -1,0 +1,62 @@
+torej hocmo slike dat na nase skatle 
+
+mamo mi v sorcu zdej neko sliko.png 
+png je brezizguben in ma enka algoritem kot zip(deflate) to pomeni da ce mas vecja obmocja enakih barv ali gradienti je boljs png 
+jpg ma bloke 8x8 blokov pixlev in gor delamo neke transformacije in iz njih porezemo visoke ferkvence pixlov kar visoki detajli ki jih ne vdimo 
+to pomeni da je izguben da brise ven detajle in ma yuv sytem (brez transparent)
+
+webp je web picture in ma boljso kompresijo ter je izgubna ampak podpira transparentnost 
+
+avif je pa a v image format in zna zelo mocno kompresirat ter tega uporabis za projekt
+
+slike naj bodo max 512X512 drgac je kurac in uporabis avif format
+
+slike so na serverju in zato bo mogu client te slike pridobit (fetch) nato se te slike dekodirajo in nastane imag bit map(RAW)
+to potem uploadamo na GPU in to je nasa textura ki jo pobom potem nalepili na nnas 3D model
+
+ta tip ma GPU manipulation program 
+
+mi mormo za vsako textuo povedat kaksen je tip, format in interni format 
+mas spletno stran k ti pove vse moznosti (lgm.fri.uni-lj.si/ziga/texture-formats/)
+
+teksturne koordiante bomo poslijali z gltf
+
+mipmapping pomeni da mas za vsako texturo en 10 slik kjer je vsaka manjsa in se jo puporabi glede na to kolk si oddaljen in to 
+dela GPE ze po defaultu 
+s tem se znebimo da sahovbnica ne utripa k si ful delec 
+ko nalozis texturo nadrdis gl.genrateMimap(gl.TEXTURE_2D)
+
+interpolacija pomeni da ce mas ti pixle kjer so barve v d+sredini ti pa izberes barvo nekje na robniku se mora ta barva izracunat
+tko da izbere najbec primarne barve pol pa primesa se mal od ostalih pixlov 
+in to je linearna interpolacija da zracunas novo vrednost na podlagi najbliznjih sosedov,
+lahko mas pa neares tko da pac pogleda ker je najbljizji pixle in vzame njegovo barvo
+
+gl.texParametri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+gl.texParametri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+ 
+v kodi 
+
+zdej pa se v shaderju to nardimo 
+
+vertex 
+
+isto k prej samo da dodamo
+
+layout (location=1) in vec2 aTextCoord;
+
+out vec2 vTextCoord;
+
+
+
+
+
+
+
+
+importamo z 
+uniform sampler2D uTexture;
+in vec2 vTexCoord (to so koordinate za vsak pixel da bo vsak pixel dubu kordionato na tej teksturi)
+
+void main() {
+    oColor = texture(uTexture, )
+}

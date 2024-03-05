@@ -1,0 +1,301 @@
+import { PortableObject, Vehicle } from "../engine/core/Interaction.js";
+import { quat, vec3 } from '../../lib/gl-matrix-module.js';
+import { Transform } from "../engine/core/Transform.js";
+export var PlaneDTO;
+(function (PlaneDTO) {
+    PlaneDTO["Plane"] = "Plane";
+    PlaneDTO["Body"] = "Body";
+    PlaneDTO["Propeler"] = "Propeler";
+    PlaneDTO["LeftLeg"] = "Left Leg";
+    PlaneDTO["LeftWing"] = "Left Wing";
+    PlaneDTO["RightLeg"] = "Right Leg";
+    PlaneDTO["RightWing"] = "Right Wing";
+    PlaneDTO["StearingLeg"] = "Stearing Leg";
+})(PlaneDTO || (PlaneDTO = {}));
+export class Plane {
+    constructor(node, camera, document) {
+        // keyboard keys
+        this.keys = {};
+        // ground controls
+        this.stearingValue = 0;
+        this.stearingMaxValue = 50; // for interface
+        this.stearingMaxRotation = 0.5; // for max de grees, is really small since this is per frame
+        this.stearingDecay = 1.3;
+        this.RPM = 0;
+        this.RPMMax = 3000;
+        this.RPMMultiplier = 10; // normalization value
+        // air controls
+        this.wingsTiltValue = 0;
+        this.wingsTiltMaxRotation = 20;
+        this.wingsTiltDecay = 1.3;
+        this.frontTiltValue = 0;
+        this.frontTiltMaxRotation = 10;
+        this.tiltMaxValue = 20; // for interface
+        //
+        this.inAir = false;
+        this.accelerationDecay = 1;
+        this.velocity = 0;
+        this.velocityMax = 50;
+        // holds the value in which camera we are
+        this.inFirstPerson = true;
+        this.camera = camera;
+        this.node = node;
+        // the parts cant move, but we still want to detect collision
+        this.node.traverse(node => node.canMove = false);
+        this.keydownHandler = this.keydownHandler.bind(this);
+        this.keyupHandler = this.keyupHandler.bind(this);
+        document.addEventListener('keydown', this.keydownHandler);
+        document.addEventListener('keyup', this.keyupHandler);
+        this.HUB = document.getElementById("HUB");
+        this.slider_Ground_Power = document.getElementById("HUB_Power");
+        this.slider_Ground_Right = document.getElementById("HUB_Right");
+        this.slider_Ground_Left = document.getElementById("HUB_Left");
+        this.slider_Air_Left = document.getElementById("HUB_Air_Left");
+        this.slider_Air_Up = document.getElementById("HUB_Air_Up");
+        this.slider_Air_Down = document.getElementById("HUB_Air_Down");
+        this.slider_Air_Right = document.getElementById("HUB_Air_Right");
+        this.body = new VehiclePart(node.find(node => node.name == PlaneDTO.Body));
+        // dodamo bodyu vehicle class
+        this.vehicle = new Vehicle(this.node, this.body.node, camera);
+        this.body.node.addComponent(this.vehicle);
+        this.propeler = new VehiclePart(node.find(node => node.name == PlaneDTO.Propeler));
+        this.propelerComponent = new Propeler(this.propeler);
+        this.propeler.node.addComponent(this.propelerComponent);
+        this.leftWing = new VehiclePart(node.find(node => node.name == PlaneDTO.LeftWing));
+        this.rightWing = new VehiclePart(node.find(node => node.name == PlaneDTO.RightWing));
+        this.leftLeg = new VehiclePart(node.find(node => node.name == PlaneDTO.LeftLeg));
+        this.rightLeg = new VehiclePart(node.find(node => node.name == PlaneDTO.RightLeg));
+        this.stearingLeg = new VehiclePart(node.find(node => node.name == PlaneDTO.StearingLeg));
+        // store some initial values
+        this.liftoffRotation = this.node.getComponentOfType(Transform).rotation;
+        this.translationYMin = this.node.getComponentOfType(Transform).getTranslationY();
+    }
+    // when we crash we give them the interacition to pick them up
+    crash() {
+        this.propeler.node.addComponent(new PortableObject(this.propeler.node, this.camera));
+        this.leftWing.node.addComponent(new PortableObject(this.leftWing.node, this.camera));
+        this.rightWing.node.addComponent(new PortableObject(this.rightWing.node, this.camera));
+        this.leftLeg.node.addComponent(new PortableObject(this.leftLeg.node, this.camera));
+        this.rightLeg.node.addComponent(new PortableObject(this.rightLeg.node, this.camera));
+        this.stearingLeg.node.addComponent(new PortableObject(this.stearingLeg.node, this.camera));
+    }
+    update(time, dt) {
+        if (!this.vehicle.interacting) {
+            // reset
+            this.propelerComponent.acceleration = 0;
+            this.RPM = 0;
+            this.stearingValue = 0;
+            this.slider_Ground_Power.value = String(0);
+            this.slider_Ground_Right.value = String(0);
+            this.slider_Ground_Left.value = String(0);
+            this.HUB.style.display = "none";
+            return;
+        }
+        this.HUB.style.display = "block";
+        const transform = this.node.getComponentOfType(Transform);
+        // default plane location y = 2.4m which is grunded, anything above that is flying
+        if (transform.getTranslationY() > this.translationYMin + 0.05)
+            this.inAir = true;
+        // landing
+        else if (this.inAir) {
+            // is speed too high we're crashing
+            if (this.velocity > this.velocityMax * 0.5) {
+            }
+            else {
+                this.inAir = false;
+                // landing procedure
+                // reset rotation
+                // reset translationY
+            }
+        }
+        // just driving arround
+        // else {}
+        ////////////////////////////////////////
+        ////////////////////////////////////////
+        // change values
+        // ground
+        // propeler / motor (*10 to sumulate real RPM)
+        if (this.keys['KeyW'])
+            this.RPM += this.RPMMultiplier;
+        else if (this.keys['KeyS'])
+            this.RPM -= this.RPMMultiplier;
+        this.RPM = Math.max(this.RPM, 0);
+        this.RPM = Math.min(this.RPM, this.RPMMax);
+        this.slider_Ground_Power.value = String(this.RPM);
+        // steering
+        if (!this.inAir) {
+            if (this.keys['KeyD'])
+                this.stearingValue = this.addDeminishValue(this.stearingValue, 1);
+            else if (this.keys['KeyA'])
+                this.stearingValue = this.addDeminishValue(this.stearingValue, -1);
+            else if (!this.keys['KeyD'] &&
+                !this.keys['KeyA']) {
+                this.stearingValue = this.addDropOff(this.stearingValue, this.stearingDecay);
+            }
+            this.stearingValue = Math.max(this.stearingValue, -this.stearingMaxValue);
+            this.stearingValue = Math.min(this.stearingValue, this.stearingMaxValue);
+        }
+        else {
+            // if in air you cant steer
+            this.stearingValue = 0;
+        }
+        this.updateHTML(this.stearingValue, this.slider_Ground_Left, this.slider_Ground_Right);
+        // air
+        // special for lift off
+        if (this.inAir || this.velocity > this.velocityMax * 0.85) {
+            if (this.keys['ArrowDown'])
+                this.frontTiltValue = this.addDeminishValue(this.frontTiltValue, -1);
+        }
+        if (this.inAir) {
+            if (this.keys['ArrowUp'])
+                this.frontTiltValue = this.addDeminishValue(this.frontTiltValue, 1);
+            if (this.keys['ArrowRight'])
+                this.wingsTiltValue = this.addDeminishValue(this.wingsTiltValue, 1);
+            else if (this.keys['ArrowLeft'])
+                this.wingsTiltValue = this.addDeminishValue(this.wingsTiltValue, -1);
+        }
+        this.updateHTML(this.frontTiltValue, this.slider_Air_Down, this.slider_Air_Up);
+        this.updateHTML(this.wingsTiltValue, this.slider_Air_Left, this.slider_Air_Right);
+        // change propeler transfom
+        this.propelerComponent.acceleration = this.RPM / 20;
+        /**
+         * Tilt
+         *
+         * so when in air we can tilt the plane to go in different directions and not just straight
+         *
+         * by controls we just monitor that tilt
+         */
+        let planeRotation = quat.clone(this.liftoffRotation);
+        // Wings
+        if (this.inAir) {
+            const wingsTiltRadianRotation = this.getRotationvalue(this.wingsTiltValue, this.tiltMaxValue, this.wingsTiltMaxRotation);
+            // apply wings tilt rotation
+            quat.rotateX(planeRotation, planeRotation, wingsTiltRadianRotation);
+        }
+        // Front
+        if (this.velocity > this.velocityMax * 0.85) {
+            const frontTiltRadianRotation = this.getRotationvalue(this.frontTiltValue, this.tiltMaxValue, this.frontTiltMaxRotation);
+            // apply front tilt rotation
+            quat.rotateZ(planeRotation, planeRotation, frontTiltRadianRotation);
+        }
+        transform.rotation = planeRotation;
+        /**
+         * Rotation
+         *
+         * if we are actually moving, plane can rotate
+         * we have tha value in HUB and need to normalize it to be in our max rotation value
+         * then we just rotate our plane by thos degrees
+         */
+        if (this.velocity > 5) {
+            const stearingRadianRotation = this.getRotationvalue(this.stearingValue, this.stearingMaxValue, this.stearingMaxRotation);
+            // apply steering wheel rotation
+            quat.rotateY(transform.rotation, transform.rotation, stearingRadianRotation);
+        }
+        /**
+         * Acceleration
+         *
+         * counted based on RPM
+         * minimum is -0.5 to slow down
+         * until 800RPM acceleration is negative
+         *
+         * TODO could be better but good for now
+         */
+        // calculate
+        this.acceleration = (this.RPM / 1000);
+        // we subtract the drop off but want it more when low values and less on bigger values
+        this.acceleration -= this.accelerationDecay * (1 - (this.RPM / this.RPMMax));
+        // make it easier to slow down when belo 800
+        if (this.RPM / this.RPMMax < 0.25)
+            this.acceleration -= this.accelerationDecay;
+        // by doing this we make it faster to speed up and faster to slow down
+        /**
+         * Velocity
+         *
+         * i dont want endless acceleration so we will implement sor of automatic gearbox
+         * it wont work like a real one but lets just say that you can't go faster if acceleration isn't high enough
+         * so we will have 3 gears
+         */
+        this.velocity += dt * this.acceleration;
+        this.velocity = Math.max(this.velocity, 0);
+        this.velocity = Math.min(this.velocity, this.velocityMax);
+        // gears
+        if (this.RPM < this.RPMMax * 0.4)
+            this.velocity = Math.min(this.velocity, this.velocityMax * 0.4);
+        else if (this.RPM < this.RPMMax * 0.7)
+            this.velocity = Math.min(this.velocity, this.velocityMax * 0.7);
+        /**
+         * Movement
+         *
+         * we always move the plane foward
+         * so we need the plane direction vector (quad matrix from rotation)
+         * then multiply that vector by velocity
+         * and add that vector to our model transformation
+         */
+        const forward = vec3.fromValues(1, 0, 0); // Assuming forward is along negative z-axis
+        vec3.transformQuat(forward, forward, transform.rotation);
+        vec3.scaleAndAdd(transform.translation, transform.translation, forward, dt * this.velocity);
+    }
+    getRotationvalue(value, maxValue, maxRotation) {
+        const normalizedValue = (value + maxValue) / (maxValue * 2);
+        // convert normalized to rotation
+        const degreesRotation = -(normalizedValue * (maxRotation * 2) - maxRotation);
+        const radianRotation = degreesRotation * (Math.PI / 180);
+        return radianRotation;
+    }
+    updateHTML(value, input1, input2) {
+        if (value > 0) {
+            input1.value = String(0);
+            input2.value = String(value);
+        }
+        else {
+            input1.value = String(Math.abs(value));
+            input2.value = String(0);
+        }
+    }
+    addDeminishValue(variable, value, multiplier) {
+        variable += value;
+        // if we're going in different direction speed up the turn
+        if ((value > 0 && variable < 0) ||
+            (value < 0 && variable > 0)) {
+            variable += value * (multiplier ?? 2);
+        }
+        return variable;
+    }
+    addDropOff(variable, decay) {
+        // if close to 0 make it otherwise it will keep adding and subtracting
+        if (Math.abs(variable) < decay)
+            variable = 0;
+        else if (variable < 0)
+            variable += decay;
+        else if (variable > 0)
+            variable -= decay;
+        return variable;
+    }
+    keydownHandler(e) {
+        this.keys[e.code] = true;
+    }
+    keyupHandler(e) {
+        this.keys[e.code] = false;
+    }
+}
+// we need a rotating motor that rotates based on time and acceleration
+class Propeler {
+    constructor(part) {
+        this.acceleration = 0;
+        this.part = part;
+    }
+    update(time, dt) {
+        // console.log(this.part.modelMatrix.rotation)
+        let modelMatrix = this.part.node.getComponentOfType(Transform);
+        quat.rotateX(modelMatrix.rotation, this.part.modelMatrix.rotation, this.acceleration * time); // to slow it down devide acceleration
+    }
+}
+// class that remembers the original position of the parts so we can put the plane back together
+class VehiclePart {
+    constructor(node) {
+        this.node = node;
+        // here we clone the transform to save origin
+        this.modelMatrix = structuredClone(node.getComponentOfType(Transform));
+    }
+}
+//# sourceMappingURL=Plane.js.map

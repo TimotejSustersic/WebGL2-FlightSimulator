@@ -1,0 +1,48 @@
+rotiranje okoli osi z 
+
+tuki se kote podaja v radianih 
+
+in ti rabis za letalo po z 
+
+njprej das mat4.create // identity 
+potem je rorate po vseh treh kotih 
+translate 
+scale 
+perspective // 
+
+nakonc mas pa multiply ki pomnoyi vse matrike skupi
+
+pred updatom nardimo matrike 
+
+modelMatrix 
+ViewMatrix 
+projectionMatrix
+ vse z mat4.create();
+
+update() {
+
+    // rotacija modela
+    mat4.identity(modelMatrix); // vsakic jo mormo ponastavit na osnovo
+    mat4.rotateX(mdelMatrix, modelMatrix, time);
+    mat4.rotateY(mdelMatrix, modelMatrix, time);
+
+
+    // kamera
+    mat4.identity(viewMatrixm); // vsakic jo mormo ponastavit na osnovo
+    mat4.translte(viewMatrixm viewMatrix, [0, 0, -3]);
+    // fromTranslation pa sam nardi identiteto
+    // zdej identiteta ni obvezna, lahki roteral skoz za fiskno vrednost vendar nocmo da je nasa rotacija odvisna od frama ampak od casa
+
+    prespektiva
+    // najprej mas kot kul je vertikalno visok kot perspektive, potem je razmerje zaslona potem pa sprejdnjo ploskev pogleda in zadnjo
+    mat4.perspektive(projectionMatrix, 1, 1, 0.01, 1000);
+
+
+    nqkonc damo to skupi 
+    const matrix  =  mat4.create(); // identity
+    mat4.multiply(matrix, modelMatrix, matrix);
+    mat4.multiply(matrix, ViewMatrix, matrix);
+    mat4.multiply(matrix, projectionMatrix, matrix);
+
+
+}

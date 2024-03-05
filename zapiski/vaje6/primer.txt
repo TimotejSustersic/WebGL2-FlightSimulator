@@ -1,0 +1,18 @@
+        //let transmodel: Transform = this.model.getComponentOfType(Transform);
+        //console.log(transmodel.matrix)
+
+        //quat.identity(transmodel.rotation)
+        //mat4.identity(transmodel.translation)
+        //mat4.identity(transmodel.scale)
+        //console.log(transmodel.matrix)
+
+
+
+
+
+
+        // let transmodel: Transform = this.model.getComponentOfType(Transform);
+        
+        // quat.identity(transmodel.translation);
+        //quat.identity(transmodel.rotation);
+        //quat.rotateZ(transmodel.rotation, transmodel.rotation, time);

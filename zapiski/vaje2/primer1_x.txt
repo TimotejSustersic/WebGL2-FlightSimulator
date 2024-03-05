@@ -1,0 +1,41 @@
+ce hocmo poslat v shader mmamo
+
+const positions = new Float32Array (...)
+
+cost positionbuffer = gl.createBuffer();
+gl.bindBuffer(gl.Array_Buffer, positionBuffer) // aktivira nas buffer in rezervira prostor na graficni in z njem nastavimo pointer na ta buffer
+
+ArrayBufferji drzije podatke o ogliscih
+
+gl.bufferData(gl.Array_Buffer, positions, gl.Static_Draw )// zadn argument pove kako bodo podatki uporabljeni (kolk se bodo spreminjal)
+
+na enak nacin nardimo se barve
+
+zdej jih mormo povezat v shader 
+
+atrivuti so vezani na oglisce uniforme so pa samo neke vrednosti ki jih uporabimo v shaderju kot so translacija
+
+torej v shadewrju smo nastavil lokacije in mormo povezat bufferje z njimi 
+najprej buffer aktiviramo 
+gl.bindBuffer()
+potem omogocimo branje iz tega bufferja na lokaciji
+gl.enableVertexAttribArray(lokacija);
+zdej pa trenutno aktiviran buffer povezemo na atribut stv 0 ter dolocimo format
+gl.vertexAttribPointer(lokacija, stevilo, tip, false, 0, 0) // (0, 2, gl.Gloat, false, 0, 0)
+
+isto nardimo za barve samo da je tip drug (1, 4, gl.Float(//32array), false, 0, 0)
+
+
+vertex shader {
+    (layout = 0) in vec2 aPosition; // atribut je lahko pozicija, barva, texturne coordinate oz podatki ki so vezani na posamezno oglisce
+    (layout = 1) in vec4 aColor;
+
+    uniform vec2 uTranslation; 
+
+    out vec4 vColr;
+
+    void main() {
+        gl_Position = vec43(aPosition + uTranslation, 0, 1);
+        vColor = aColor;
+    }
+}

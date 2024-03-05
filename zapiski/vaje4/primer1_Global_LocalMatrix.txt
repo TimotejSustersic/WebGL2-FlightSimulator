@@ -1,0 +1,30 @@
+fovy = field of view 
+sprednja in zadnja rezalna ravnina (near far)
+
+vzames patriko modela 
+potem inverz matrike kamere (is k x na linearni funkiji (+1 je vizulano -1))
+in potrem se pomnozimo z camera projection;
+
+to v renderju nrdimo 
+
+modelMatrix = modelTransform.matrix;
+modelMatrix = modelTransform.matrix; // od camere 
+mat4.invert(viewMatrix, viewMatrix)
+projetion matrix 
+
+matrix = mat4.create 
+matrix .multiply(z vseme tremi matrikami) // vrstni red je zelo pomemben 
+
+se kamero mormo prestavt in tudi tuki je + nazaj 
+
+gl.enable(gl.DEPTH_TEST); // v startu
+na oncu ko brisemo canvas mormo brisat tudi depth_BUFFER_BIT 
+
+ko mas hierarhijo mas vsak objekt svojo lokalno matriko ki se potem nazaj pomnoži z vsemi matrikami starsev in to je nas model matrix 
+to pomnozimo potem se s kamero (view matrix inverziran)  potem pa to se z projection matrixom 
+
+zdej k mamo ta get global whatever funnkcije nardimo samo 
+
+modelMatrix = getGlobalModelMatrix(model);
+vievMatrix = getGlobalViewMatrix(camera)
+projectionMatrix = getGlobalProjectionMatrix(camera);

@@ -1,0 +1,1 @@
+ti fili se ne smejo compilat zato vse 4 koperi v dist folder
