@@ -1,0 +1,17 @@
+Hello!
+
+this is a game in which you try and fly a plane trough the hoops without hitting them
+
+you start by pressing the start buton and finnish in the same matter
+in the mean time you try to fly the plane and complete the score
+for each hoop you fail you loose time
+
+each level completed difficulty rises
+you get more hoops and the are spread closer together
+
+Good LUCK!!
+
+
+`
+You can change initial dificulty (Game.ts) and inAir stearing in code (Plane.ts)
+`

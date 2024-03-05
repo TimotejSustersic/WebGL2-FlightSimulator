@@ -1,0 +1,103 @@
+1. Vzpostavil TS server
+2. Uporabne file spremenil v TS, jim dodal tipe in poenostavil kodo
+3. vse file je blo tud treba mocno posodobit
+4. Ustavril DTO-je in podrobneje definiral vsak razred, da vsaj vem kaj delam
+
+5. Iz examplov v projekt integriral FirstPersonControler in Physics(Collision)
+
+6. Dogradil shaderje z Lambertovim in Phongovim modelom.
+    v Renderju sedaj posiljam v sahder se Luč, Pozicijo kamere ter normale.
+    Lambertov model vzame smer luči in smer normale ter kosinus njunega kota zmnoži z barvo
+    Phongov model pa iz smeri luči na površino, preko normale, izračuna odboj nato pa vzame kosinus med odbojem in smerjo kamere proti površini ter prišteje barvi
+
+7. Implementacija interakcije. Nov class za interakcijo v katerem jo začnemo in končamo, kjer mora biti nek osnoven časovni zamik
+    Iz Implementacije izpeljal dva razreda, en za pobiranje predmetov in drug za vozila, kjer je glavna distinkcija v besedilu, ter kako vplivata na hierarhijo scene ob 
+    začeku in koncu interakcije.
+
+8. Blender work - narest je treba letalo, z propelerjem 
+
+9. Dogradit interakcijo se prestavit v letalo ter spremenit hierarhijo ob start in reset 
+
+implementirat letenje letala:
+
+10. Propeler 
+11. na tleh
+    - problemi so ker plane nima aabb in ni interactable zato more bit body ampak body ni fotr vsem ostalim plus druge tazave so
+    - bomo probal narest da je body nas plane in vrh hierarhije
+
+    - delovanje, mas zadnje kolo(roacijo lahk otud vizualno) za smer, ki je lahko maximalno 90 ce full pocas drgac pa manjsamo na 45
+    - ke bo isto stev sam se bo velik hitrej manjsal pa ta avtomatsko pada ko spustis, gas pa reguleras vrednost
+    - naprej nazaj mas pa gas ki vpliva na propeler. kle mas max RPM ki linerano manjsa hitrost ko je na nuli gas pa 1-10 veca (na vsake 200 ms)
+12. vzlet in v zraku 
+13. pristanek
+
+14. HUB 
+
+15. Kroge na nebu
+    - ustvaritev krogov z blenderjem, clonirat node, dodelit njihove lokacije in tezavnosti 
+
+16. Circle collision
+    AABB odpade.. izluscimo radij kroga, ter radij letala. Potem pa samo nardimo standar cilcular collision 
+    z krogi tako da vzamemo vse tocke okoli kroga aka radij in pogledamo ce se nahajajo v nasem krogu
+    - razdalja + radij letala < radij kroga
+    problem je ker je krog 2D letalo pa 3D tko da najprej iscemo direc proximity aka collision med sferami
+    potem pa gledamo 2D collision po YZ osi
+
+17. Game class ki doloca potek igre
+
+18. Dodelat classe z malenkostimi in popravki:
+    - pogoji da skocis vn z letala / koncas interakcijo
+    - popravki v hierarhiji ob interakcijah
+    - letenje in pristajanje
+    - gravitacija of crashu
+    - dodaj prestave na RPM (hitrost ne more 80 ce motor ne laufa / omeji na ground da bolj bremza v zraku pa plava)
+
+19.  Bleder.. spet 
+    - dodat nek zunanji vir zacetka igre in izbire tezavnosti (verjetno neka hiska)
+    - to spet zahteva popravke ob zacetku igre itd.
+    - mapo povecat in dodajanje detajlov
+
+20.  Testiranja in optimizacije
+    - piljenje game classa da mamo dobre razlike med tezavnostimi
+    - polepsanje huba za boljso interaktivnost (CSS)
+    - start screen
+
+21. Third Person Controller
+    - omogocit samo med letenjem
+    - translacija kamere
+    - kamera vedno usmerjena v objekt/letalo
+
+Konec: Porocilo
+
+Bononcki {
+    - letalo lahko razpade na VehicleParts in ga preko interakcije nato sestavimo hierarhijo nazaj skupaj (50%){
+        hierarhija ni problem, interakcije tud ne (oboje je narejeno)
+        problem je kako se deli razprsijo na tla.. aka kako so obrnjeni in kolk dalec so od tal (da ne lebdijo)
+        verjetno bi mogu za vsak del hardcoderat (not good)
+    }
+}
+
+22. Linearna interpolacija. Za letalo je na nek nacin ze dodana ker mam value od 0 do 50 in je ze smooth
+    dodal bom pa se eno po formuli za premik kamere
+
+23. Particles 
+    - ustvarjajo glede na hitrost letala
+    - za kolesa uporabljeno
+    - lokacija je okoli kolesam rotacija in skalacija pa z manjsimi razlikami da ni vse enako
+    - osnovna fizika je pozitivni sinus
+    - po dolocenem casu zgine
+
+Snov {
+    razlaga zakaj krogi ne delajo 
+        problem je ker je zam krog manjsi od pixla in to se resi z anti alasing tko da vzamse vec pixlov ter nardis interpolacijo med njimi
+        drugui ncin je pa da resolucijo povecas kar ni dejanska resitev 
+        in ko se te pixli premikajo enkrat vzame rumeno enkrat belo enkrat pa crn oker mas se sencilnik przgan
+
+    collision detection deluje najprej ma quad tree in v njem je preprosto sfericno in skatlo potem ce je tam collision nardis se bolj 
+    natancne algoritme k grejo prov trikotnike gledat
+
+    mat4.perspective.. z njem dolocimo naso prirezano piramido
+    parameter fov pove kolk poblizana je kamera (original dobis preko gltf tko da spremenis v blenderju verjetno)
+
+    nauc MVP pa razliko med global view in model in local metrix
+}
